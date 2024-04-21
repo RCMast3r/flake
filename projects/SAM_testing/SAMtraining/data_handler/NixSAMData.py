@@ -14,6 +14,7 @@ class SAMDataset(Dataset):
         max_dict = self.find_max_second_number(prompt_res_path)
 
         self.ground_truths = self.load_images_from_folder(prompt_res_path, max_dict)
+
         self.processor = processor
 
     # for handling the masks
@@ -64,11 +65,11 @@ class SAMDataset(Dataset):
         return bbox
 
     def __len__(self):
-        return len(self.dataset)
+        return len(self.image_data)
 
     def __getitem__(self, idx):
         
-        item = self.dataset[idx]
+        
         image = self.image_data[idx]
         
         ground_truth_mask = self.ground_truths[idx]
