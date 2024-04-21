@@ -4,8 +4,11 @@ from torch.utils.data import Dataset
 
 # TODO add in the loading from an environment variable
 class SAMDataset(Dataset):
-    def __init__(self, dataset, processor):
-        self.dataset = dataset
+
+    def __init__(self, ground_truth_path, image_dataset_path, processor):
+
+        self.image_data = np.load(os.path.join(image_dataset_path, "samples.npy"), allow_pickle=True)
+        # self.ground_truth_path = 
         self.processor = processor
 
     def get_bounding_box(ground_truth_map):
@@ -27,8 +30,9 @@ class SAMDataset(Dataset):
         return len(self.dataset)
 
     def __getitem__(self, idx):
+        
         item = self.dataset[idx]
-        image = item["image"]
+        image = self.image_data[idx]
         ground_truth_mask = np.array(item["label"])
 
         # get bounding box prompt

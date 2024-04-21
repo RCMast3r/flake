@@ -24,9 +24,13 @@ in
 
       # get the source code from the inputs to the flake
       # function for creating the package variant for a target platform
-      
-      # mkDataset = args: pkgs.callPackage ./dataset.nix ({ inherit src; } // args);
-      mkDataset = pkgs.callPackage ./dataset.nix;
+      datasetVariants = {
+        clock_dataset = pkgs.callPackage ./dataset_creator.nix ({ dataset_url = inputs.clock_dataset_url; });
+      };
+      mkGroundTruths = pkgs.callPackage ./groundtruths.nix;
+      mkTrainScript = pkgs.callPackage ./train_script.nix;
+
+
     in
     {
       # devshells.SAM-devshell = {
@@ -42,10 +46,18 @@ in
       #     python3Variants.nvidia.torch
       #   ];
       # };
-      packages = {
-        dataset = mkDataset { };
+      packages = rec {
+        trainSAM = mkTrainScript {
+          dataset = datasetVariants.clock_dataset;
+        };
+        groundtruths = mkGroundTruths { };
+        clock_dataset = datasetVariants.clock_dataset;
         # actually calling the mkSegmentAnythingVariant function with specific parameters depending on 
         # desired package platform variant for segment anything 
+      };
+
+      apps = {
+        train_clock.program = "${mkTrainScript { dataset = datasetVariants.clock_dataset; }}/bin/train.py";
       };
     };
 

@@ -36,9 +36,13 @@
       url = "github:hercules-ci/hercules-ci-effects";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    clock_dataset_url = {
+      url = "https://www.dropbox.com/scl/fo/zxmucpwwnd4w0428bj9r9/h/Clock?rlkey=mtvz27lainry7anehq8ahf7sn&dl=1";
+      flake = false;
+    };
     devshell.url = "github:numtide/devshell";
   };
-  outputs = { flake-parts, invokeai-src, hercules-ci-effects, devshell, segment-anything-src, SAM-FunML-src, ... }@inputs:
+  outputs = { flake-parts, invokeai-src, hercules-ci-effects, devshell, segment-anything-src, SAM-FunML-src, clock_dataset_url, ... }@inputs:
     flake-parts.lib.mkFlake { inherit inputs; } {
       perSystem = { system, ... }: {
         _module.args.pkgs = import inputs.nixpkgs { config.allowUnfree = true; inherit system; };

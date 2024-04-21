@@ -16,6 +16,18 @@
         "type": "github"
       }
     },
+    "clock_dataset_url": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-RQJO8NA5Dyvx6miy0V8p9AAFNkd0I+jPR0aNzg2fDgU=",
+        "type": "file",
+        "url": "https://www.dropbox.com/scl/fo/zxmucpwwnd4w0428bj9r9/h/Clock?dl=1&rlkey=mtvz27lainry7anehq8ahf7sn"
+      },
+      "original": {
+        "type": "file",
+        "url": "https://www.dropbox.com/scl/fo/zxmucpwwnd4w0428bj9r9/h/Clock?dl=1&rlkey=mtvz27lainry7anehq8ahf7sn"
+      }
+    },
     "devshell": {
       "inputs": {
         "flake-utils": "flake-utils",
@@ -166,6 +178,7 @@
     "root": {
       "inputs": {
         "SAM-FunML-src": "SAM-FunML-src",
+        "clock_dataset_url": "clock_dataset_url",
         "devshell": "devshell",
         "flake-parts": "flake-parts",
         "hercules-ci-effects": "hercules-ci-effects",
