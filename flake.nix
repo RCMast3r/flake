@@ -18,6 +18,11 @@
       url = "github:oobabooga/text-generation-webui/v1.7";
       flake = false;
     };
+    segment-anything-src = {
+      url = "github:facebookresearch/segment-anything";
+      flake = false;
+    };
+
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "nixpkgs";
@@ -26,15 +31,14 @@
       url = "github:hercules-ci/hercules-ci-effects";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    devshell.url = "github:numtide/devshell";
   };
-  outputs = { flake-parts, invokeai-src, hercules-ci-effects, ... }@inputs:
+  outputs = { flake-parts, invokeai-src, hercules-ci-effects, devshell, ... }@inputs:
     flake-parts.lib.mkFlake { inherit inputs; } {
       perSystem = { system, ... }: {
         _module.args.pkgs = import inputs.nixpkgs { config.allowUnfree = true; inherit system; };
         legacyPackages = {
           koboldai = builtins.throw ''
-
-
                    koboldai has been dropped from nixified.ai due to lack of upstream development,
                    try textgen instead which is better maintained. If you would like to use the last
                    available version of koboldai with nixified.ai, then run:
@@ -48,11 +52,14 @@
       ];
       debug = true;
       imports = [
+        devshell.flakeModule
         hercules-ci-effects.flakeModule
 #        ./modules/nixpkgs-config
         ./overlays
         ./projects/invokeai
         ./projects/textgen
+        ./projects/segment_anything
+        ./projects/SAM_testing
         ./website
       ];
     };
