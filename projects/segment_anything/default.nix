@@ -24,12 +24,19 @@ in
 
       # get the source code from the inputs to the flake
       src = inputs.segment-anything-src;
+      predictor-src = inputs.SAM-FunML-src;
 
       # function for creating the package variant for a target platform
       mkSegmentAnythingVariant = args: pkgs.callPackage ./package.nix ({ inherit src; } // args);
-
+      mkPredictorVariant = args: pkgs.callPackage ./predictor.nix ({ src = predictor-src; } // args);
+      predictor = mkPredictorVariant {
+          segment_anything = mkSegmentAnythingVariant {
+          python3Packages = python3Variants.nvidia;
+        };
+        }; 
     in
     {
+      
       devshells.SAM-devshell = {
         # env = [
           # {
@@ -39,12 +46,16 @@ in
         # ];
         
         packages = [
+          predictor
           python3Variants.nvidia.torch
         ];
       };
-      packages = {
+      packages = rec {
         SAM-nvidia = mkSegmentAnythingVariant {
           python3Packages = python3Variants.nvidia;
+        };
+        predictor = mkPredictorVariant {
+          segment_anything = SAM-nvidia;
         };
         # actually calling the mkSegmentAnythingVariant function with specific parameters depending on 
         # desired package platform variant for segment anything 

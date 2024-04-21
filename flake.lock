@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "SAM-FunML-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1709608118,
+        "narHash": "sha256-UDJfi+OrcUbtv6ho1xBzuSfjDFRJcsBLqAmNTxpo79A=",
+        "owner": "RCMast3r",
+        "repo": "SAM-FunML-sp24",
+        "rev": "5f9c07b6076c86bd0e15ca82c37e5be5badbbe5a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "RCMast3r",
+        "repo": "SAM-FunML-sp24",
+        "type": "github"
+      }
+    },
     "devshell": {
       "inputs": {
         "flake-utils": "flake-utils",
@@ -149,6 +165,7 @@
     },
     "root": {
       "inputs": {
+        "SAM-FunML-src": "SAM-FunML-src",
         "devshell": "devshell",
         "flake-parts": "flake-parts",
         "hercules-ci-effects": "hercules-ci-effects",

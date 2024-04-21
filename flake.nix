@@ -23,6 +23,11 @@
       flake = false;
     };
 
+    SAM-FunML-src = {
+      url = "github:RCMast3r/SAM-FunML-sp24";
+      flake = false;
+    };
+
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "nixpkgs";
@@ -33,7 +38,7 @@
     };
     devshell.url = "github:numtide/devshell";
   };
-  outputs = { flake-parts, invokeai-src, hercules-ci-effects, devshell, ... }@inputs:
+  outputs = { flake-parts, invokeai-src, hercules-ci-effects, devshell, segment-anything-src, SAM-FunML-src, ... }@inputs:
     flake-parts.lib.mkFlake { inherit inputs; } {
       perSystem = { system, ... }: {
         _module.args.pkgs = import inputs.nixpkgs { config.allowUnfree = true; inherit system; };
