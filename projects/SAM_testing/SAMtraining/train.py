@@ -1,21 +1,26 @@
 #!/usr/bin/python3
 
+from torch.utils.data import DataLoader
+from data_handler.NixSAMData import SAMDataset
+from transformers import SamModel, SamProcessor
 
-# from torch.utils.data import DataLoader
-# from NixSAMData import SAMDataset
-# from transformers import SamModel 
-# from torch.optim import Adam
-# import monai
-# from tqdm import tqdm
-# from statistics import mean
-# import torch
-# from torch.nn.functional import threshold, normalize
+from torch.optim import Adam
+import monai
+from tqdm import tqdm
+from statistics import mean
+import torch
+from torch.nn.functional import threshold, normalize
 
+import numpy as np
+import os
+import sys
+image_dataset_path= os.environ.get('DATASET')
+ground_truth_path= os.environ.get('GROUNDTRUTH')
+ground_truth_type = os.environ.get('GT_TYPE')
 
-# train_dataset = SAMDataset(dataset=dataset, processor=processor)
+processor = SamProcessor.from_pretrained("facebook/sam-vit-base")
+train_dataset = SAMDataset(ground_truth_type=ground_truth_type, ground_truth_path=ground_truth_path, image_dataset_path=image_dataset_path, processor=processor)
 # train_dataloader = DataLoader(train_dataset, batch_size=2, shuffle=True)
-
-
 
 # model = SamModel.from_pretrained("facebook/sam-vit-base")
 
@@ -57,9 +62,3 @@
 #     print(f'EPOCH: {epoch}')
 #     print(f'Mean loss: {mean(epoch_losses)}')
      
-import numpy as np
-import os
-import sys
-image_dataset_path= os.environ.get('DATASET')
-print(image_dataset_path)
-image_data = np.load(os.path.join(image_dataset_path, "samples.npy"), allow_pickle=True)

@@ -57,7 +57,7 @@ in
       };
 
       apps = {
-        train_clock.program = "${mkTrainScript { dataset = datasetVariants.clock_dataset; }}/bin/train.py";
+        train_clock.program = "${mkTrainScript { dataset = datasetVariants.clock_dataset; groundtruths = mkGroundTruths { }; GT_type = "Clock"; }}/bin/train.py";
       };
     };
 
