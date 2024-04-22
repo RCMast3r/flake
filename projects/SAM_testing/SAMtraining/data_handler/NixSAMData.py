@@ -1,7 +1,7 @@
 # based on https://github.com/NielsRogge/Transformers-Tutorials/tree/master
 import numpy as np
 from torch.utils.data import Dataset
-from torchvision.transforms import Resize, Compose, ToTensor
+from torchvision.transforms import Resize, Compose, ToTensor, Grayscale
 
 from PIL import Image
 import os
@@ -19,8 +19,8 @@ class SAMDataset(Dataset):
 
         self.processor = processor
         self.transform = Compose([
-            Resize((224, 224)),  # Resize the image to 224x224 pixels
-            ToTensor()  # Convert the PIL image to a PyTorch Tensor
+            Resize((224, 224)),
+            ToTensor()
         ])
 
     # for handling the masks
@@ -83,13 +83,19 @@ class SAMDataset(Dataset):
 
         # Resize and transform image and mask
         image = Image.fromarray(image)  # Convert numpy array to PIL Image
+        if image.mode != 'RGB':
+            image = image.convert('RGB')  # Ensure image is in RGB
         image = self.transform(image)  # Apply the transformations
 
         ground_truth_mask = Image.fromarray(ground_truth_mask)
         ground_truth_mask = self.transform(ground_truth_mask)
 
         prompt = self.get_bounding_box(ground_truth_mask)
-
+        print("Image shape:", image.shape)
+        print("Image dtype:", image.dtype)
+        print("Image range:", image.min(), image.max())
+        # if image.mode != 'RGB':
+        #     image = image.convert('RGB')
         inputs = self.processor(image, input_boxes=[[prompt]], return_tensors="pt")
         inputs = {k: v.squeeze(0) for k, v in inputs.items()}
         inputs["ground_truth_mask"] = ground_truth_mask
