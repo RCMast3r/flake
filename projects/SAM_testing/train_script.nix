@@ -3,6 +3,8 @@
 , dataset
 , GT_type
 , groundtruths
+, torch
+, cudaPackages
 }:
 
 python3Packages.buildPythonApplication {
@@ -10,7 +12,8 @@ python3Packages.buildPythonApplication {
   version = "1.0.0";
 
   propagatedBuildInputs = [
-    python3Packages.torch
+    torch
+    # python3Packages.torch
     python3Packages.torchvision
     python3Packages.numpy
     python3Packages.transformers

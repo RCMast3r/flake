@@ -28,28 +28,33 @@ in
         clock_dataset = pkgs.callPackage ./dataset_creator.nix ({ dataset_url = inputs.clock_dataset_url; });
       };
       mkGroundTruths = pkgs.callPackage ./groundtruths.nix;
-      mkTrainScript = pkgs.callPackage ./train_script.nix;
+      mkTrainScript = args: pkgs.callPackage ./train_script.nix (args);
 
-
+      cudaSupport = true;
+      
     in
     {
-      # devshells.SAM-devshell = {
-      #   env = [
-      #     {
-      #       # TODO add in the paths to training sets n stuff that would be cool
-      #       dataset_test = 
-      #     }
-      #   ];
+      devshells.SAM-devshell = {
+        # env = [
+        #   {
+        #     # TODO add in the paths to training sets n stuff that would be cool
+        #     dataset_test = 
+        #   }
+        # ];
 
-      #   packages = [
-      #     dataset
-      #     python3Variants.nvidia.torch
-      #   ];
-      # };
+        packages = [
+          # datasetenv = [
+        #   {
+        #     # TODO add in the paths to training sets n stuff that would be cool
+        #     dataset_test = 
+        #   }
+        # ];
+          python3Variants.nvidia.torch
+        ];
+      };
+      
       packages = rec {
-        trainSAM = mkTrainScript {
-          dataset = datasetVariants.clock_dataset;
-        };
+        trainSAM = mkTrainScript { dataset = datasetVariants.clock_dataset; groundtruths = mkGroundTruths { }; GT_type = "Clock"; python3Packages = python3Variants.nvidia; };
         groundtruths = mkGroundTruths { };
         clock_dataset = datasetVariants.clock_dataset;
         # actually calling the mkSegmentAnythingVariant function with specific parameters depending on 
@@ -57,7 +62,19 @@ in
       };
 
       apps = {
-        train_clock.program = "${mkTrainScript { dataset = datasetVariants.clock_dataset; groundtruths = mkGroundTruths { }; GT_type = "Clock"; }}/bin/train.py";
+        train_clock = let
+          trainScript = mkTrainScript { 
+            dataset = datasetVariants.clock_dataset; 
+            groundtruths = mkGroundTruths { }; 
+            GT_type = "Clock";
+            python3Packages = python3Variants.nvidia; 
+            torch = python3Variants.nvidia.torch; 
+          };
+        in
+        {
+          type = "app";
+          program = "${trainScript}/bin/train.py";
+        };
       };
     };
 

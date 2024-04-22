@@ -1,6 +1,8 @@
 # based on https://github.com/NielsRogge/Transformers-Tutorials/tree/master
 import numpy as np
 from torch.utils.data import Dataset
+from torchvision.transforms import Resize, Compose, ToTensor
+
 from PIL import Image
 import os
 # TODO add in the loading from an environment variable
@@ -10,12 +12,16 @@ class SAMDataset(Dataset):
 
         self.image_data = np.load(os.path.join(image_dataset_path, "samples.npy"), allow_pickle=True)
         
-        prompt_res_path = os.path.join(ground_truth_path, "Prompting_results", ground_truth_type, "st1")
+        prompt_res_path = os.path.join(ground_truth_path, "Prompting_results", ground_truth_type, "st1", "masks")
         max_dict = self.find_max_second_number(prompt_res_path)
-
+        print(prompt_res_path)
         self.ground_truths = self.load_images_from_folder(prompt_res_path, max_dict)
 
         self.processor = processor
+        self.transform = Compose([
+            Resize((224, 224)),  # Resize the image to 224x224 pixels
+            ToTensor()  # Convert the PIL image to a PyTorch Tensor
+        ])
 
     # for handling the masks
     def find_max_second_number(self, folder_path):
@@ -49,8 +55,10 @@ class SAMDataset(Dataset):
                         print(f"Error opening image {filename}")
         return images
         
-    def get_bounding_box(ground_truth_map):
+    def get_bounding_box(self, ground_truth_map):
         # get bounding box from mask
+        ground_truth_map = ground_truth_map.squeeze()
+        print("Ground truth map shape:", ground_truth_map.shape)
         y_indices, x_indices = np.where(ground_truth_map > 0)
         x_min, x_max = np.min(x_indices), np.max(x_indices)
         y_min, y_max = np.min(y_indices), np.max(y_indices)
@@ -71,19 +79,18 @@ class SAMDataset(Dataset):
         
         
         image = self.image_data[idx]
-        
         ground_truth_mask = self.ground_truths[idx]
 
-        # get bounding box prompt
+        # Resize and transform image and mask
+        image = Image.fromarray(image)  # Convert numpy array to PIL Image
+        image = self.transform(image)  # Apply the transformations
+
+        ground_truth_mask = Image.fromarray(ground_truth_mask)
+        ground_truth_mask = self.transform(ground_truth_mask)
+
         prompt = self.get_bounding_box(ground_truth_mask)
 
-        # prepare image and prompt for the model
         inputs = self.processor(image, input_boxes=[[prompt]], return_tensors="pt")
-
-        # remove batch dimension which the processor adds by default
         inputs = {k: v.squeeze(0) for k, v in inputs.items()}
-
-        # add ground truth segmentation
         inputs["ground_truth_mask"] = ground_truth_mask
-
         return inputs

@@ -3,6 +3,7 @@
 from torch.utils.data import DataLoader
 from data_handler.NixSAMData import SAMDataset
 from transformers import SamModel, SamProcessor
+import torch.nn.functional as F
 
 from torch.optim import Adam
 import monai
@@ -34,7 +35,8 @@ seg_loss = monai.losses.DiceCELoss(sigmoid=True, squared_pred=True, reduction='m
 
 num_epochs = 100
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
+device = "cuda"
+print(torch.cuda.is_available())
 model.to(device)
 
 model.train()
@@ -47,9 +49,10 @@ for epoch in range(num_epochs):
                       multimask_output=False)
 
       # compute loss
-      predicted_masks = outputs.pred_masks.squeeze(1)
-      ground_truth_masks = batch["ground_truth_mask"].float().to(device)
-      loss = seg_loss(predicted_masks, ground_truth_masks.unsqueeze(1))
+      predicted_masks = outputs.pred_masks.squeeze(1)  # Squeeze if there's an unnecessary extra dimension
+      ground_truth_masks = batch["ground_truth_mask"].float().to(device).squeeze(1)  # Make sure this matches expected dimensions
+      ground_truth_masks = F.interpolate(ground_truth_masks.unsqueeze(1), size=(256, 256), mode='bilinear', align_corners=False)  # Resize if needed
+      loss = seg_loss(predicted_masks, ground_truth_masks)
 
       # backward pass (compute gradients of parameters w.r.t. loss)
       optimizer.zero_grad()
