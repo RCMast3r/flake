@@ -29,7 +29,8 @@ in
       };
       mkGroundTruths = pkgs.callPackage ./groundtruths.nix;
       mkTrainScript = args: pkgs.callPackage ./train_script.nix (args);
-
+      mkWeights = args: pkgs.callPackage ./weights.nix (args);
+      # mkEvalScript = pkgs.callPackage ./eval.nix;
       cudaSupport = true;
       
     in
@@ -54,8 +55,9 @@ in
       };
       
       packages = rec {
-        trainSAM = mkTrainScript { dataset = datasetVariants.clock_dataset; groundtruths = mkGroundTruths { }; GT_type = "Clock"; python3Packages = python3Variants.nvidia; };
+        trainSAM = mkTrainScript { dataset = datasetVariants.clock_dataset; groundtruths = mkGroundTruths { }; GT_type = "Clock"; python3Packages = python3Variants.nvidia; torch = python3Variants.nvidia.torch; };
         groundtruths = mkGroundTruths { };
+        weights = mkWeights { train_script = trainSAM; };
         clock_dataset = datasetVariants.clock_dataset;
         # actually calling the mkSegmentAnythingVariant function with specific parameters depending on 
         # desired package platform variant for segment anything 
