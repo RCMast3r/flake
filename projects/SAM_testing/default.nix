@@ -30,31 +30,28 @@ in
       mkGroundTruths = pkgs.callPackage ./groundtruths.nix;
       mkTrainScript = args: pkgs.callPackage ./train_script.nix (args);
       mkWeights = args: pkgs.callPackage ./weights.nix (args);
+      getWeights = args: pkgs.callPackage ./weights_passthrough.nix (args);
       # mkEvalScript = pkgs.callPackage ./eval.nix;
       cudaSupport = true;
-      
+      hfw = getWeights {src = inputs.hf_in;};
     in
     {
       devshells.SAM-devshell = {
-        # env = [
-        #   {
-        #     # TODO add in the paths to training sets n stuff that would be cool
-        #     dataset_test = 
-        #   }
-        # ];
+        env = [
+          {
+            name = "dataset_test";
+            value = hfw;
+          }
+        ];
 
         packages = [
-          # datasetenv = [
-        #   {
-        #     # TODO add in the paths to training sets n stuff that would be cool
-        #     dataset_test = 
-        #   }
-        # ];
-          python3Variants.nvidia.torch
+          hfw
+          # python3Variants.nvidia.torch
         ];
       };
       
       packages = rec {
+        hfw = hfw;
         trainSAM = mkTrainScript { dataset = datasetVariants.clock_dataset; groundtruths = mkGroundTruths { }; GT_type = "Clock"; python3Packages = python3Variants.nvidia; torch = python3Variants.nvidia.torch; };
         groundtruths = mkGroundTruths { };
         weights = mkWeights { train_script = trainSAM; };

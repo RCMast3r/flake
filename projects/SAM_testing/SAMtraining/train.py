@@ -17,7 +17,7 @@ image_dataset_path = os.environ.get('DATASET')
 ground_truth_path = os.environ.get('GROUNDTRUTH')
 ground_truth_type = os.environ.get('GT_TYPE')
 
-processor = SamProcessor.from_pretrained("facebook/sam-vit-base")
+processor = SamProcessor.from_pretrained("facebook/sam-vit-base", cache_dir=".")
 dataset = SAMDataset(ground_truth_type=ground_truth_type, ground_truth_path=ground_truth_path, image_dataset_path=image_dataset_path, processor=processor)
 
 # Split dataset into train and validation

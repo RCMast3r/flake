@@ -126,6 +126,18 @@
         "type": "github"
       }
     },
+    "hf_in": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-rx74WIGRq5DApkuNLBGljK89z3S+L0L2i6aLu9YhKng=",
+        "type": "file",
+        "url": "https://huggingface.co/facebook/sam-vit-base/tree/main"
+      },
+      "original": {
+        "type": "file",
+        "url": "https://huggingface.co/facebook/sam-vit-base/tree/main"
+      }
+    },
     "invokeai-src": {
       "flake": false,
       "locked": {
@@ -182,6 +194,7 @@
         "devshell": "devshell",
         "flake-parts": "flake-parts",
         "hercules-ci-effects": "hercules-ci-effects",
+        "hf_in": "hf_in",
         "invokeai-src": "invokeai-src",
         "nixpkgs": "nixpkgs_2",
         "segment-anything-src": "segment-anything-src",
