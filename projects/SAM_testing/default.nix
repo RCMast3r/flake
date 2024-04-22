@@ -21,7 +21,7 @@ in
           overlays.python-bitsAndBytesOldGpu
         ]);
       };
-
+      # test = inputs.hf_in;
       # get the source code from the inputs to the flake
       # function for creating the package variant for a target platform
       datasetVariants = {
@@ -30,29 +30,33 @@ in
       mkGroundTruths = pkgs.callPackage ./groundtruths.nix;
       mkTrainScript = args: pkgs.callPackage ./train_script.nix (args);
       mkWeights = args: pkgs.callPackage ./weights.nix (args);
-      getWeights = args: pkgs.callPackage ./weights_passthrough.nix (args);
-      # mkEvalScript = pkgs.callPackage ./eval.nix;
+      base_weights = pkgs.callPackage ./weights_passthrough.nix { };
       cudaSupport = true;
-      hfw = getWeights {src = inputs.hf_in;};
     in
     {
       devshells.SAM-devshell = {
         env = [
           {
-            name = "dataset_test";
-            value = hfw;
+            name = "dir";
+            value = base_weights;
           }
         ];
 
         packages = [
-          hfw
-          # python3Variants.nvidia.torch
+          base_weights
+          python3Variants.nvidia.torch
         ];
       };
-      
+
       packages = rec {
-        hfw = hfw;
-        trainSAM = mkTrainScript { dataset = datasetVariants.clock_dataset; groundtruths = mkGroundTruths { }; GT_type = "Clock"; python3Packages = python3Variants.nvidia; torch = python3Variants.nvidia.torch; };
+        trainSAM = mkTrainScript { 
+          dataset = datasetVariants.clock_dataset; 
+          groundtruths = mkGroundTruths { }; 
+          GT_type = "Clock"; 
+          python3Packages = python3Variants.nvidia; 
+          torch = python3Variants.nvidia.torch; 
+          input_weights = base_weights;
+        };
         groundtruths = mkGroundTruths { };
         weights = mkWeights { train_script = trainSAM; };
         clock_dataset = datasetVariants.clock_dataset;
@@ -61,19 +65,21 @@ in
       };
 
       apps = {
-        train_clock = let
-          trainScript = mkTrainScript { 
-            dataset = datasetVariants.clock_dataset; 
-            groundtruths = mkGroundTruths { }; 
-            GT_type = "Clock";
-            python3Packages = python3Variants.nvidia; 
-            torch = python3Variants.nvidia.torch; 
+        train_clock =
+          let
+            trainScript = mkTrainScript {
+              dataset = datasetVariants.clock_dataset;
+              groundtruths = mkGroundTruths { };
+              GT_type = "Clock";
+              python3Packages = python3Variants.nvidia;
+              torch = python3Variants.nvidia.torch;
+              input_weights = base_weights;
+            };
+          in
+          {
+            type = "app";
+            program = "${trainScript}/bin/train.py";
           };
-        in
-        {
-          type = "app";
-          program = "${trainScript}/bin/train.py";
-        };
       };
     };
 

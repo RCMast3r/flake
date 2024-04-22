@@ -1,4 +1,4 @@
-{ lib, stdenv, fetchurl, src, fetchgit }:
+{ lib, stdenv, fetchgit }:
 
 stdenv.mkDerivation rec {
   name = "weights_passthrough";
@@ -6,14 +6,14 @@ stdenv.mkDerivation rec {
   dontFixup = true;
   dontBuild = true;
   src = fetchgit {
-    url = src.url;
-    
-  };
+      url = "https://huggingface.co/facebook/sam-vit-base";
+      rev = "70c1a07f894ebb5b307fd9eaaee97b9dfc16068f";
+      hash = "sha256-8cN98pYePEj+TmuXFSYLQIOsRc0CUP0rhgdERlG8Wl8=";
+      fetchLFS = true;
+    };
   installPhase = ''
     mkdir -p $out
-    ls source
-    ls ${src}
-    cp -r ${src} $out
+    cp ${src}/* $out
   '';
 
 }

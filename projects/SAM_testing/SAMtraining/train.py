@@ -16,8 +16,9 @@ torch.manual_seed(21231)
 image_dataset_path = os.environ.get('DATASET')
 ground_truth_path = os.environ.get('GROUNDTRUTH')
 ground_truth_type = os.environ.get('GT_TYPE')
+pre_path = os.environ.get('WEIGHTS_BASE')
 
-processor = SamProcessor.from_pretrained("facebook/sam-vit-base", cache_dir=".")
+processor = SamProcessor.from_pretrained(pre_path, cache_dir=".", local_files_only=True)
 dataset = SAMDataset(ground_truth_type=ground_truth_type, ground_truth_path=ground_truth_path, image_dataset_path=image_dataset_path, processor=processor)
 
 # Split dataset into train and validation
@@ -28,7 +29,7 @@ train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
 train_dataloader = DataLoader(train_dataset, batch_size=2, shuffle=True)
 val_dataloader = DataLoader(val_dataset, batch_size=2, shuffle=False)
 
-model = SamModel.from_pretrained("facebook/sam-vit-base")
+model = SamModel.from_pretrained(pre_path, cache_dir=".", local_files_only=True)
 
 # Make sure we only compute gradients for mask decoder
 for name, param in model.named_parameters():

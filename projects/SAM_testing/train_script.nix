@@ -5,6 +5,7 @@
 , groundtruths
 , torch
 , cudaPackages
+, input_weights
 }:
 
 python3Packages.buildPythonApplication {
@@ -19,6 +20,6 @@ python3Packages.buildPythonApplication {
     python3Packages.transformers
     python3Packages.monai
   ];
-  makeWrapperArgs = ["--set DATASET ${dataset}" "--set GROUNDTRUTH ${groundtruths}" "--set GT_TYPE ${GT_type}" ];
+  makeWrapperArgs = [ "--set WEIGHTS_BASE ${input_weights}" "--set DATASET ${dataset}" "--set GROUNDTRUTH ${groundtruths}" "--set GT_TYPE ${GT_type}" ];
   src = ./SAMtraining;
 }
