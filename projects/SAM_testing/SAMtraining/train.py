@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, random_split
 from data_handler.NixSAMData import SAMDataset
 from transformers import SamModel, SamProcessor
 import torch.nn.functional as F
@@ -15,13 +15,30 @@ from torch.nn.functional import threshold, normalize
 import numpy as np
 import os
 import sys
+
+torch.manual_seed(21231)    
+
 image_dataset_path= os.environ.get('DATASET')
 ground_truth_path= os.environ.get('GROUNDTRUTH')
 ground_truth_type = os.environ.get('GT_TYPE')
 
+
 processor = SamProcessor.from_pretrained("facebook/sam-vit-base")
-train_dataset = SAMDataset(ground_truth_type=ground_truth_type, ground_truth_path=ground_truth_path, image_dataset_path=image_dataset_path, processor=processor)
+
+
+
+dataset = SAMDataset(ground_truth_type=ground_truth_type, ground_truth_path=ground_truth_path, image_dataset_path=image_dataset_path, processor=processor)
+
+
+train_size = int(0.8 * len(dataset))
+val_size = len(dataset) - train_size
+train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
+
+
+
 train_dataloader = DataLoader(train_dataset, batch_size=2, shuffle=True)
+val_dataloader = DataLoader(val_dataset, batch_size=2, shuffle=False)
+
 
 model = SamModel.from_pretrained("facebook/sam-vit-base")
 
