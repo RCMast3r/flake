@@ -40,7 +40,7 @@ optimizer = Adam(model.mask_decoder.parameters(), lr=1e-5, weight_decay=0)
 seg_loss = monai.losses.DiceCELoss(sigmoid=True, squared_pred=True, reduction='mean')
 
 num_epochs = 5
-device = "cuda" if torch.cuda.is_available() else "cpu"
+device = "cuda"
 model.to(device)
 
 # Initialize best loss value for model saving condition
