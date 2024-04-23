@@ -65,6 +65,8 @@ If you are on another distro, just add these two lines to `/etc/nix/nix.conf`. I
     trusted-substituters = https://ai.cachix.org
     trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= ai.cachix.org-1:N9dzRK+alWwoKXQlnn0H6aUx0lU/mspIoz8hMvGvbbc=
 
-Sets of models can be trained with a dataset using one command: NIXPKGS_ALLOW_UNFREE=1 nix run --impure github:nix-community/nixGL -- nix run --impure .#train_clock
+Sets of models can be trained with a dataset using one command: 
+
+    `NIXPKGS_ALLOW_UNFREE=1 nix run --impure github:nix-community/nixGL -- nix run --impure .#train_clock`
 
 It is not necessary to have pre-built weights for the models. When Sam and TinySAM are run, the weights will be trained for you by Nix!
